@@ -7,7 +7,12 @@ const PUNCHES_KEY = 'fichada_punches';
 function read<T>(key: string, fallback: T): T {
   try {
     const raw = localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : fallback;
+    if (!raw) return fallback;
+    const valor = JSON.parse(raw) as unknown;
+    // Un `"null"`, un número o un objeto en el lugar de la lista dejaban la
+    // pantalla en blanco al hacer `.map`. Si no es un array, se usa el default.
+    if (Array.isArray(fallback) && !Array.isArray(valor)) return fallback;
+    return valor as T;
   } catch {
     return fallback;
   }
