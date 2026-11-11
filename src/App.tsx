@@ -41,18 +41,36 @@ export default function App() {
   const [selectedEmployee, setSelectedEmployee] = useState(initial.employees[0]?.id ?? '');
   const [selectedBranch, setSelectedBranch] = useState('');
   const [geo, setGeo] = useState<GeoState>({ state: 'idle' });
+  // En la demo nadie está parado en las sucursales ficticias (y muchos rechazan el
+  // permiso de ubicación): este selector permite probar los tres casos sin GPS.
+  const [simulacion, setSimulacion] = useState<'gps' | 'dentro' | 'cerca' | 'lejos'>('gps');
   const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (branches.length && selectedBranch) {
       refreshGeo();
     }
-  }, [selectedBranch, branches]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedBranch, branches, simulacion]);
 
   function refreshGeo() {
     if (!selectedBranch) return;
     const branch = branches.find((b) => b.id === selectedBranch);
     if (!branch) return;
+    if (simulacion !== 'gps') {
+      const metros =
+        simulacion === 'dentro' ? 0 : simulacion === 'cerca' ? branch.radiusMeters + 60 : 1500;
+      const { lat, lng } = desplazar(branch.lat, branch.lng, metros);
+      setGeo({
+        state: 'ok',
+        lat,
+        lng,
+        within: metros <= branch.radiusMeters,
+        distance: Math.round(metros),
+        branch,
+      });
+      return;
+    }
     if (!navigator.geolocation) {
       setGeo({ state: 'error', message: 'Tu navegador no soporta geolocalización.' });
       return;
@@ -203,6 +221,21 @@ export default function App() {
               </select>
             </label>
 
+            <label>
+              Ubicación para la demo
+              <select
+                value={simulacion}
+                onChange={(e) =>
+                  setSimulacion(e.target.value as 'gps' | 'dentro' | 'cerca' | 'lejos')
+                }
+              >
+                <option value="gps">Usar mi GPS real</option>
+                <option value="dentro">Simular dentro de la sucursal</option>
+                <option value="cerca">Simular a 60 m del límite</option>
+                <option value="lejos">Simular a 1,5 km</option>
+              </select>
+            </label>
+
             {geo.state === 'ok' && selectedBranch && (
               <div className={`geo ${geo.within ? 'ok' : 'warning'}`}>
                 {geo.within
@@ -322,6 +355,13 @@ export default function App() {
       </footer>
     </div>
   );
+}
+
+/** Punto a `metros` de otro, hacia el norte (suficiente para la demo). */
+function desplazar(lat: number, lng: number, metros: number): { lat: number; lng: number } {
+  const gradosLat = metros / 111_320;
+  const gradosLng = metros / (111_320 * Math.cos((lat * Math.PI) / 180) || 1);
+  return { lat: lat + gradosLat, lng: lng + gradosLng };
 }
 
 function haversine(lat1: number, lng1: number, lat2: number, lng2: number): number {
