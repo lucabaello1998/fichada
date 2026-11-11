@@ -1,5 +1,7 @@
 # 🕐 Fichada
 
+[![Release](https://img.shields.io/github/v/release/lucabaello1998/fichada?label=release)](https://github.com/lucabaello1998/fichada/releases/latest)
+
 Demo de fichaje laboral (clock in/out) para una pyme argentina.
 
 > **Este es un producto standalone de demostración.** No es el sistema de ninguna empresa real, no contiene datos reales ni está vinculado a ningún ERP.
