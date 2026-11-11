@@ -35,7 +35,10 @@ export default function App() {
     window.location.hash = tab;
   }, [tab]);
 
-  const [selectedEmployee, setSelectedEmployee] = useState('');
+  // El primer empleado viene elegido: la demo arranca lista para tocar "Registrar
+  // entrada" en vez de pedir dos selects antes de mostrar nada. La sucursal no,
+  // porque elegirla dispara el pedido de ubicación.
+  const [selectedEmployee, setSelectedEmployee] = useState(initial.employees[0]?.id ?? '');
   const [selectedBranch, setSelectedBranch] = useState('');
   const [geo, setGeo] = useState<GeoState>({ state: 'idle' });
   const [message, setMessage] = useState<string | null>(null);
