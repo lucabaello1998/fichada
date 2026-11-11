@@ -17,6 +17,12 @@ El empleado ficha entrada y salida desde el celular u ordenador. Si el navegador
 - CI con GitHub Actions (Node 20 y 22)
 - Deploy automático en GitHub Pages
 
+## Demostración sin GPS
+
+La pantalla de fichar tiene un selector **Ubicación para la demo** (*mi GPS real*, *dentro de la
+sucursal*, *a 60 m del límite*, *a 1,5 km*): permite ver los tres casos sin estar parado en una de las
+sucursales ficticias ni dar permiso de ubicación.
+
 ## Cómo correrlo
 
 ```bash
